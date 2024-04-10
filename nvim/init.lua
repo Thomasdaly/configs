@@ -9,14 +9,6 @@ if not vim.loop.fs_stat(lazypath) then
 		lazypath,
 	})
 end
-vim.diagnostic.config({
-    virtual_text = true,
-    signs = true,
-    underline = true,
-    update_in_insert = false,
-    severity_sort = true,
-})
-
 vim.opt.rtp:prepend(lazypath)
 vim.api.nvim_set_option("clipboard", "unnamed")
 require("vim-options")
