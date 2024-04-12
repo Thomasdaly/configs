@@ -1,54 +1,71 @@
 return {
-  {
-    "williamboman/mason.nvim",
-    lazy = false,
+  { "williamboman/mason.nvim",
     config = function()
       require("mason").setup()
     end,
-  }, 
-  {
-
-    "williamboman/mason-lspconfig.nvim",
-    lazy = false,
-    opts = {
-      auto_install = true,
- 
-    }
   },
-  {
-    "neovim/nvim-lspconfig",
-    lazy = false,
+  { "williamboman/mason-lspconfig.nvim",
     config = function()
-      local capabilities = require('cmp_nvim_lsp').default_capabilities()
+      require("mason-lspconfig").setup({
+        auto_install = true,
+      })
+    end,
+  },
+  { "neovim/nvim-lspconfig",
+    config = function()
+      -- Updated capabilities for Neovim 0.8 and newer
+      local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
       local lspconfig = require("lspconfig")
+
+      -- Python with pyright
+      lspconfig.pyright.setup({
+        capabilities = capabilities,
+      })
+
+      -- PHP with intelephense
+      lspconfig.intelephense.setup({
+        capabilities = capabilities,
+      })
+
+      -- JavaScript and TypeScript with tsserver
       lspconfig.tsserver.setup({
-        capabilities = capabilities
+        capabilities = capabilities,
       })
+
+      -- HTML, CSS, JSON with vscode-langservers-extracted
       lspconfig.html.setup({
-        capabilities = capabilities
+        capabilities = capabilities,
       })
-      lspconfig.black.setup({
-        capabilities = capabilities
+      lspconfig.cssls.setup({
+        capabilities = capabilities,
       })
+      lspconfig.jsonls.setup({
+        capabilities = capabilities,
+      })
+
+      -- Lua development, especially useful for Neovim config
       lspconfig.lua_ls.setup({
-        capabilities = capabilities
+        capabilities = capabilities,
+        settings = {
+          Lua = {
+            diagnostics = {
+              globals = {'vim'},
+            },
+            workspace = {
+              library = vim.api.nvim_get_runtime_file("", true),
+              -- Adjust your Lua version as necessary
+              checkThirdParty = false,
+            },
+            -- Adjust as necessary
+            telemetry = {
+              enable = false,
+            },
+          },
+        },
       })
-      lspconfig.phpactor.setup({
-  cmd = { "phpactor", "language-server" },
-  filetypes = { "php", "blade" },
-  root_dir = lspconfig.util.root_pattern("composer.json", ".git"),
-  init_options = {
-    ["language_server_worse_reflection.inlay_hints.enable"] = true,
-    ["language_server_worse_reflection.inlay_hints.params"] = true,
-    -- ["language_server_worse_reflection.inlay_hints.types"] = true,
-    ["language_server_configuration.auto_config"] = false,
-    ["code_transform.import_globals"] = true,
-    ["language_server_phpstan.enabled"] = true,
-    ["language_server_phpstan.level"] = 7,
-    ["language_server_phpstan.bin"] = "phpstan",
-  },
-})
+
+      -- Key mappings
       vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
       vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, {})
       vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, {})
@@ -56,3 +73,4 @@ return {
     end,
   },
 }
+
